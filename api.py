@@ -36,15 +36,16 @@ def trim(str):
 
 @app.post('/userinfo')
 async def upload_info_endpoint(userinfo: UserInfo):
-    trimmed_string = trim(userinfo.Image)
-    img_data = getBytes(trimmed_string)
-    face_recogniser.add_face(img_data)
+    
+    #trimmed_string = trim(userinfo.Image)
+    #img_data = getBytes(trimmed_string)
+    #face_recogniser.add_face(img_data)
 
     return userinfo
 
 @app.post('/picture')
 async def get_faces(picture: Picture):
-    trimmed_string = trim(picture.Image)
-    img_data = getBytes(trimmed_string)
-    person = face_recogniser.run_recognition(img_data)
-    return person
+    #trimmed_string = trim(picture.Image)
+    #img_data = getBytes(trimmed_string)
+    #person = face_recogniser.run_recognition(img_data)
+    return picture#person
