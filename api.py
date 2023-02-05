@@ -26,4 +26,4 @@ async def upload_info_endpoint(userinfo: UserInfo):
 async def get_faces(picture: Picture):
     #img_data = getBytes(picture.Image)
     #person = face_recogniser.run_recognition(img_data)
-    return person
+    return picture#person
