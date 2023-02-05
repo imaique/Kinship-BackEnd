@@ -17,13 +17,13 @@ class UserInfo(BaseModel):
 @app.post('/userinfo')
 async def upload_info_endpoint(userinfo: UserInfo):
     
-    #img_data = getBytes(userinfo.Image)
-    #face_recogniser.add_face(img_data)
+    img_data = getBytes(userinfo.Image)
+    face_recogniser.add_face(img_data)
 
     return userinfo
 
 @app.post('/picture')
 async def get_faces(picture: Picture):
-    #img_data = getBytes(picture.Image)
-    #person = face_recogniser.run_recognition(img_data)
-    return picture#person
+    img_data = getBytes(picture.Image)
+    person = face_recogniser.run_recognition(img_data)
+    return person
