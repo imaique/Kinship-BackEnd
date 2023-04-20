@@ -1,11 +1,43 @@
 import face_recognition
 import os
+import boto3
 import cv2
 import numpy as np
 import math
 from PIL import Image
-from utils import converter, saveImg
+from utils import converter
 from db_compare import db_compare
+from pathlib import Path
+
+AWS_BUCKET = 'kinship-bucket'
+
+
+session = boto3.Session(
+    aws_access_key_id='AKIASMMC5NREJZCNV3NL',
+    aws_secret_access_key='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'
+)
+
+s3 = session.resource('s3')
+bucket = s3.Bucket(AWS_BUCKET)
+
+some_binary_data = b'Here we have some data'
+object = s3.Object(AWS_BUCKET, 'filename.jpg')
+object.put(Body=some_binary_data)
+
+
+
+
+bucket.put_object(Key='test.txt')
+
+def uploadImg(img: bytes, counter, event):
+    object = s3.Object(AWS_BUCKET, f'{counter}.jpg')
+    object.put(Body=img)
+
+def saveImg(img: bytes, counter, event):
+    with open(f"{event}/{counter}.jpg", "wb") as binary_file:
+        binary_file.write(img)
+    
+    
 
 def face_confidence(face_distance, face_match_threshold=0.6):
     range = (1.0 - face_match_threshold)
@@ -29,10 +61,10 @@ class FaceRecognition:
     def __init__(self):
         self.encode_faces()
 
-    def add_face(self, image_b64):
-        face_image = converter(image_b64)
+    def add_face(self, image_bytes):
         image_id = self.counter
-        saveImg(face_image, image_id, "faces")
+        self.uploadImg(image_bytes, image_id, "polyhacks")
+        self.saveImg(image_bytes, image_id, "polyhacks")
         self.counter += 1
         self.append_image(f'{image_id}.jpg')
 
@@ -44,13 +76,24 @@ class FaceRecognition:
         self.known_face_ids.append(image)
 
     def encode_faces(self):
+
+        for file_name in bucket.objects.filter(Prefix="polyhacks", Delimiter="/"):
+            file_path = Path('polyhacks/' + file_name.key)
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            print(file_path)
+            #bucket.download_file(
+            #    file_path,
+            #    file_path
+            #)
+            self.counter += 1
+
         for image in os.listdir('faces'):
             self.append_image(image)
-        self.counter +=1
+        
 
     def run_recognition(self, img_b64):
         img_bytes = converter(img_b64)
-        saveImg(img_bytes,0,"temp")
+        self.saveImg(img_bytes,0,"temp")
         
         # numpydata = np.asarray()
 
